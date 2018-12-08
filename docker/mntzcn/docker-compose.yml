@@ -1,0 +1,102 @@
+version: '3'
+
+services:
+  hadoop:
+    build: ./hadoop
+    container_name: hadoop
+    ports:
+      - 9000:9000 # hdfs port
+      - 8088:8088 # YARN
+      - 19888:19888 # JobTracker
+      - 50070:50070 # NameNode
+      - 50075:50075 # DataNode
+    command: bash -c "chmod +x /etc/bootstrap.sh && sh /etc/bootstrap.sh -d"
+
+  master:
+    build: ./spark
+    command: bash -c "/usr/sbin/sshd && bin/spark-class org.apache.spark.deploy.master.Master -h master"
+    container_name: spark_master
+    hostname: master
+    environment:
+      MASTER: spark://master:7077
+      SPARK_CONF_DIR: /conf
+      SPARK_PUBLIC_DNS: localhost
+    links:
+      - hadoop
+    expose:
+      - 7001
+      - 7002
+      - 7003
+      - 7004
+      - 7005
+      - 7006
+      - 7077
+      - 6066
+      - '22'
+    ports:
+      - 4040:4040
+      - 6066:6066
+      - 7077:7077
+      - 18080:8080
+      - 5005:5005 #For remote debug
+      - '2222:22'
+    volumes:
+      - ./spark/conf/master:/conf:z
+      - ./spark/classpath:/classpath:z
+
+  worker:
+    build: ./spark
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
+    container_name: spark_worker
+    hostname: worker
+    environment:
+      SPARK_CONF_DIR: /conf
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 1g
+      SPARK_WORKER_PORT: 8881
+      SPARK_WORKER_WEBUI_PORT: 8081
+      SPARK_PUBLIC_DNS: localhost
+    links:
+      - master
+      - hadoop
+    expose:
+      - 7012
+      - 7013
+      - 7014
+      - 7015
+      - 7016
+      - 8881
+    ports:
+      - 8081:8081
+    volumes:
+      - ./spark/conf/worker:/conf:z
+      - ./spark/classpath:/classpath:z
+  #hue:
+    #image: gethue/hue
+    #container_name: hue
+    #expose:
+    #  - 8888
+    #ports:
+    #  - 8888:8888
+    #links:
+    #  - hadoop
+    #  - master
+    #  - worker
+  oozie:
+    build: ./oozie
+    container_name: hadoop_oozie
+    command: su oozie -c 'oozied.sh run'
+    expose:
+      - 11000
+      - 11001
+    ports:
+      - 11000:11000
+      - 11001:11001
+    links:
+      - hadoop
+      - master
+
+
+networks:
+  default:
+    driver: bridge
