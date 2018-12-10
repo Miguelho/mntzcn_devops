@@ -89,6 +89,7 @@ services:
     expose:
       - 11000
       - 11001
+    # host:container
     ports:
       - 11000:11000
       - 11001:11001
@@ -96,6 +97,27 @@ services:
       - hadoop
       - master
 
+  # OLTP
+  db:
+    image: mysql
+    container_name: mtnzcn_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+    - 1000:3306
+    expose:
+    - 1000
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+    volumes:
+      - /Users/miguelhalysortuno/Documents/Master/data:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8090:8080
+    expose:
+      - 8090
 
 networks:
   default:
