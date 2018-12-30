@@ -118,6 +118,9 @@ services:
       - 8090:8080
     expose:
       - 8090
+  sqoop:
+      build: ./sqoop
+      container_name: mntzcn_sqoop
 
 networks:
   default:

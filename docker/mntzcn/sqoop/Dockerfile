@@ -1,5 +1,5 @@
 FROM sequenceiq/hadoop-docker:2.7.1
-# Update to Java 8
+
 ENV JAVA_VERSION 8u191
 ENV BUILD_VERSION b13
 
@@ -22,13 +22,21 @@ RUN alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 20000
 
 ENV JAVA_HOME /usr/java/latest
 
-ADD bootstrap.sh /etc/bootstrap.sh
-ADD hdfsTestFiles/ /filesToUpHDFS
-ADD hdfs-site.xml /etc/hdfs-site.xml
-ADD core-site.xml.template /etc/core-site.xml.template
-ADD hdfs-site.xml /etc/hdfs-site.xml
-# oozie-sharelib-4.2.0.tar.gz must be download first to run this dockerfile. It can be found within the base oozie image
-ADD oozie-sharelib-4.2.0.tar.gz /etc/oozie-sharelib-4.2.0.tar.gz
-RUN useradd -ms /bin/bash oozie
+## SQOOP
+ENV SQOOP_HOME /usr/local/sqoop
+RUN curl http://apache.rediris.es/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz | tar -xz -C /usr/local
 
-CMD ["sh", "/etc/bootstrap.sh", "-d"]
+RUN ln -s /usr/local/sqoop-1.4.7.bin__hadoop-2.6.0 $SQOOP_HOME
+
+ENV PATH $PATH:$HADOOP_HOME/bin:$SQOOP_HOME/bin
+
+COPY bootstrap.sh /etc/bootstrap.sh
+# HADOOP CONF
+COPY yarn-site.xml /etc/yarn-site.xml.template
+# DRIVER CONNECTOR VERSION
+ADD jdbc/mysql-connector-java-8.0.12.jar /etc/sqoop-libs/mysql-connector-java-8.0.12.jar
+ADD lib/json-20180813.jar /usr/local/sqoop/lib/json-20180813.jar
+RUN chown root.root /etc/bootstrap.sh
+RUN chmod 700 /etc/bootstrap.sh
+
+CMD ["/etc/bootstrap.sh"]
