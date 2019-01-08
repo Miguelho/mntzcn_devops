@@ -3,7 +3,7 @@
 mkdir -p /user/oozie
 chown oozie -R /user/oozie
 mv /etc/oozie-sharelib-4.2.0.tar.gz/** /user/oozie/
-
+tar -xzf /etc/oozie-sharelib-4.2.0.tar.gz -C /user/oozie/
 HADOOP_PREFIX=/usr/local/hadoop
 
 $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
@@ -25,8 +25,19 @@ $HADOOP_PREFIX/sbin/start-all.sh
 
 $HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh start historyserver
 
-$HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hdfs dfs -mkdir /ch01-identity && $HADOOP_PREFIX/bin/hdfs dfs -put /filesToUpHDFS/oozie/** / && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/oozie/share/lib && $HADOOP_PREFIX/bin/hdfs dfs -put /user/oozie/share/lib /user/oozie/share/lib && echo COPIED && tail -f /dev/null
+$HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave \
+&& $HADOOP_PREFIX/bin/hdfs dfs -mkdir /ch01-identity \
+&& $HADOOP_PREFIX/bin/hdfs dfs -put /filesToUpHDFS/oozie/** / \
+&& $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/oozie/share/lib \
+&& $HADOOP_PREFIX/bin/hdfs dfs -put /user/oozie/share/lib /user/oozie/share/lib \
+&& $HADOOP_PREFIX/bin/hdfs dfs -put /filesToUpHDFS/sqoop.password /user/root/sqoop.password \
+&& echo COPIED
+
+# Prepare mntzcn process
+$HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /etl/ingest/mntzcn
 
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done
 fi
+
+tail -f /dev/null

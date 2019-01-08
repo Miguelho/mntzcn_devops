@@ -18,7 +18,7 @@ sed s/HOSTNAME/$HADOOP_URL/ $HADOOP_HOME/etc/hadoop/core-site.xml.template > /us
 /usr/sbin/sshd
 # HADOOP_HOME/sbin/start-dfs.sh
 # $HADOOP_HOME/sbin/start-yarn.sh
-#$HADOOP_HOME/bin/mapred --daemon start historyserver
+# $HADOOP_HOME/bin/mapred --daemon start historyserver
 # $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
 # $HADOOP_HOME/bin/hdfs dfsadmin -safemode leave
 

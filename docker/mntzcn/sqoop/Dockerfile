@@ -1,26 +1,6 @@
-FROM sequenceiq/hadoop-docker:2.7.1
+FROM mntzcn/hadoop-2.7.1-java-1.8
 
-ENV JAVA_VERSION 8u191
-ENV BUILD_VERSION b13
-
-ENV JAVA_BINARIES_URL https://download.oracle.com/otn-pub/java/jdk/8u192-b12/750e1c8617c5452694857ad95c3ee230/jdk-8u192-linux-x64.rpm
-# RUN yum history sync
-
-# Upgrading system
-# RUN yum -y upgrade
-RUN yum -y install wget || true
-RUN yum history sync
-# Downloading Java
-# RUN wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-$BUILD_VERSION/jdk-$JAVA_VERSION-linux-x64.rpm" -O /tmp/jdk-8-linux-x64.rpm
-RUN wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" $JAVA_BINARIES_URL -O /tmp/jdk-8-linux-x64.rpm
-
-RUN yum -y install /tmp/jdk-8-linux-x64.rpm || true
-
-RUN alternatives --install /usr/bin/java jar /usr/java/latest/bin/java 200000
-RUN alternatives --install /usr/bin/javaws javaws /usr/java/latest/bin/javaws 200000
-RUN alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000
-
-ENV JAVA_HOME /usr/java/latest
+ENV SQOOP_VERSION 1.4.7
 
 ## SQOOP
 ENV SQOOP_HOME /usr/local/sqoop
@@ -34,8 +14,13 @@ COPY bootstrap.sh /etc/bootstrap.sh
 # HADOOP CONF
 COPY yarn-site.xml /etc/yarn-site.xml.template
 # DRIVER CONNECTOR VERSION
-ADD jdbc/mysql-connector-java-8.0.12.jar /etc/sqoop-libs/mysql-connector-java-8.0.12.jar
+ENV MYSQL_CONNECTOR_VERSION 8.0.12
+ADD jdbc/mysql-connector-java-$MYSQL_CONNECTOR_VERSION.jar /etc/sqoop-libs/mysql-connector-java-$MYSQL_CONNECTOR_VERSION.jar
 ADD lib/json-20180813.jar /usr/local/sqoop/lib/json-20180813.jar
+# COPY SQOOP JOBS
+RUN mkdir -p /opt/sqoop/jobs/
+COPY jobs/* /opt/sqoop/jobs/
+
 RUN chown root.root /etc/bootstrap.sh
 RUN chmod 700 /etc/bootstrap.sh
 
