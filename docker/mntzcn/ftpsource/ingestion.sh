@@ -3,7 +3,7 @@ alias hdfs=$HADOOP_PREFIX/bin/hdfs
 
 ## HADOOP HOST
 HADOOP_HOST=hdfs://hadoop:9000
-HADOOP_DEST="$HADOOP_HOST"/data/master/telco/events
+HADOOP_DEST="$HADOOP_HOST"/data/master/telco/event
 echo Data is ingested at $HADOOP_DEST
 ## PATH DEFINITION
 dataPath=$1
@@ -56,3 +56,5 @@ else
     echo "">"$failurePath"/output
     mv execution.log "$failurePath"
 fi
+
+#/bin/bash && tail -f /dev/null

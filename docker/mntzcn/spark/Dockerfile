@@ -1,33 +1,28 @@
-FROM gettyimages/spark:2.1.0-hadoop-2.7
+FROM mntzcn/hadoop-2.7.1-java-1.8
 
-CMD /usr/spark-2.1.0/sbin/start-history-server.sh
-RUN mkdir /tmp/spark-events
+# Download & Install Spark
+RUN wget https://archive.apache.org/dist/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz
+RUN tar xf spark-2.3.0-bin-hadoop2.7.tgz
+RUN mv spark-2.3.0-bin-hadoop2.7 /opt
+RUN ln -s /opt/spark-2.3.0-bin-hadoop2.7 /opt/spark
+RUN rm spark-2.3.0-bin-hadoop2.7.tgz
 
-# Installing ssh
-RUN apt-get update && apt-get install -y openssh-server
-RUN mkdir /var/run/sshd
-RUN echo 'root:screencast' | chpasswd
-RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# Download & Install MySql Driver
+ENV MYSQL_CONNECTOR_VERSION 8.0.12
+ADD lib/jdbc/mysql-connector-java-$MYSQL_CONNECTOR_VERSION.jar /opt/spark/jars
+#RUN wget https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java-5.1.45.tar.gz
+#RUN tar xf mysql-connector-java-5.1.45.tar.gz
+#RUN mv mysql-connector-java-5.1.45/mysql-connector-java-5.1.45-bin.jar /opt/spark/jars
+#RUN rm -rf mysql-connector-java-5.1.45
 
-# SSH login fix. Otherwise user is kicked off after login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN mkdir -p /shared_data
 
-ENV NOTVISIBLE "in users profile"
-RUN echo "export VISIBLE=now" >> /etc/profile
-
-# Server key
-ENV KEYPATH=./id_rsa
-
-#RUN /usr/sbin/sshd -d
-
-## End
-
-# Fix a bug. Hadoop common include avro 1.7.4 which is not compatible with Spark
-# I've applied following solution https://github.com/SingularitiesCR/spark-docker/issues/5
-COPY lib/avro-1.7.7.jar /tmp/avro-1.7.7.jar
-RUN rm $HADOOP_HOME/share/hadoop/common/lib/avro-1.7.4.jar \
-    && rm $HADOOP_HOME/share/hadoop/mapreduce/lib/avro-1.7.4.jar \
-    && cp /tmp/avro-1.7.7.jar $HADOOP_HOME/share/hadoop/common/lib \
-    && mv /tmp/avro-1.7.7.jar $HADOOP_HOME/share/hadoop/mapreduce/lib
+ENV SPARK_VERSION 2.3.0
+ENV SPARK_HOME /opt/spark
 
 WORKDIR $SPARK_HOME
+
+# -- HADOOP CONFIGURATION
+ADD bootstrap.sh /etc/bootstrap.sh
+RUN chown root.root /etc/bootsrap.sh \
+&& sh /etc/bootstrap.sh

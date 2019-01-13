@@ -12,7 +12,8 @@ ENV PATH $PATH:$HADOOP_HOME/bin:$SQOOP_HOME/bin
 
 COPY bootstrap.sh /etc/bootstrap.sh
 # HADOOP CONF
-COPY yarn-site.xml /etc/yarn-site.xml.template
+COPY yarn-site.xml.template /etc/yarn-site.xml.template
+COPY core-site.xml.template /etc/core-site.xml.template
 # DRIVER CONNECTOR VERSION
 ENV MYSQL_CONNECTOR_VERSION 8.0.12
 ADD jdbc/mysql-connector-java-$MYSQL_CONNECTOR_VERSION.jar /etc/sqoop-libs/mysql-connector-java-$MYSQL_CONNECTOR_VERSION.jar

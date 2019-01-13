@@ -1,10 +1,12 @@
-FROM mntzcn/hadoop-2.7.1-java-1.8
+FROM hadoop-shm:latest
 
 ADD bootstrap.sh /etc/bootstrap.sh
+RUN chown root:root /etc/bootstrap.sh
+RUN chmod 700 /etc/bootstrap.sh
 ADD hdfsTestFiles/ /filesToUpHDFS
-ADD hdfs-site.xml /etc/hdfs-site.xml
+ADD hdfs-site.xml.template /etc/hdfs-site.xml.template
 ADD core-site.xml.template /etc/core-site.xml.template
-ADD hdfs-site.xml /etc/hdfs-site.xml
+ADD yarn-site.xml.template /etc/yarn-site.xml.template
 # oozie-sharelib-4.2.0.tar.gz must be download first to run this dockerfile. It can be found within the base oozie image
 ADD oozie-sharelib-4.2.0.tar.gz /etc/oozie-sharelib-4.2.0.tar.gz
 RUN useradd -ms /bin/bash oozie
