@@ -16,6 +16,8 @@ services:
       - 50070:50070 # NameNode
       - 50075:50075 # DataNode
     command: bash -c "chmod +x /etc/bootstrap.sh && sh /etc/bootstrap.sh -d"
+    volumes:
+      - $PWD/conf/hive-site.xml:/user/oozie/hive-site.xml
 
   hive:
     build:
@@ -28,8 +30,8 @@ services:
     - $PWD/conf/hive-site.xml:/opt/hive/conf/hive-site.xml
     - $PWD/container_data/hive/warehouse:/shared_data/hive/warehouse
     #- $PWD/table_data:/shared_data/table_data
-    links:
-    - mysql-metastore
+#    links:
+#    - metastore
 
 #  metastore:
 #    build:
@@ -54,7 +56,7 @@ services:
       SPARK_PUBLIC_DNS: localhost
     links:
     - "hadoop:hadoop"
-    - "mysql-metastore:mysql-metastore"
+#    - "metastore:metastore"
     expose:
     - 7001
     - 7002
@@ -104,7 +106,7 @@ services:
     volumes:
     - $PWD/spark/conf/worker:/conf:z
     - $PWD/spark/classpath:/classpath:z
-
+# TODO SCHEDULE A SPARK JOB https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.5/bk_spark-component-guide/content/ch_oozie-spark-action.html
   oozie:
     build: ./oozie
     container_name: hadoop_oozie
@@ -121,7 +123,7 @@ services:
       - master
 
    # OLTP
-  db:
+  oltp:
     image: mysql
     container_name: mtnzcn_mysql
     command: --default-authentication-plugin=mysql_native_password

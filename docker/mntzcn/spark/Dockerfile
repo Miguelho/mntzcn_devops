@@ -10,10 +10,6 @@ RUN rm spark-2.3.0-bin-hadoop2.7.tgz
 # Download & Install MySql Driver
 ENV MYSQL_CONNECTOR_VERSION 8.0.12
 ADD lib/jdbc/mysql-connector-java-$MYSQL_CONNECTOR_VERSION.jar /opt/spark/jars
-#RUN wget https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java-5.1.45.tar.gz
-#RUN tar xf mysql-connector-java-5.1.45.tar.gz
-#RUN mv mysql-connector-java-5.1.45/mysql-connector-java-5.1.45-bin.jar /opt/spark/jars
-#RUN rm -rf mysql-connector-java-5.1.45
 
 RUN mkdir -p /shared_data
 
@@ -24,5 +20,14 @@ WORKDIR $SPARK_HOME
 
 # -- HADOOP CONFIGURATION
 ADD bootstrap.sh /etc/bootstrap.sh
-RUN chown root.root /etc/bootsrap.sh \
+RUN chown root.root /etc/bootstrap.sh \
 && sh /etc/bootstrap.sh
+
+USER root
+# -- OOZIE CONFIGURATION
+ADD wait.sh /etc/wait.sh
+ADD setup-oozie.sh /etc/setup-oozie.sh
+
+RUN chown root /etc/wait.sh \
+&& chmod +x /etc/wait.sh
+#&& /etc/wait.sh http://hadoop:50070 sh /etc/setup-oozie.sh

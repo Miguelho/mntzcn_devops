@@ -1,0 +1,27 @@
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='Mntzcn'>
+    <start to='spark-node' />
+
+    <action name='spark-node'>
+        <spark xmlns="uri:oozie:spark-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>${master}</master>
+            <mode>client</mode>
+            <name>Mntzcn</name>
+            <class>org.miguelho.kmeans.Main</class>
+            <jar>${nameNode}/user/oozie/jobs/mntzn-assembly-0.1-SNAPSHOT.jar</jar>
+            <spark-opts>--files hive-site.xml</spark-opts>
+            <arg>${master}</arg>
+            <arg>hdfs://hadoop:9000/data/master/telco/</arg>
+            <arg>hdfs://hadoop:9000/etl/ingest/telco/mntzcn/activity_pattern/in</arg>
+            <arg>hdfs://hadoop:9000/etl/process/telco/mntzcn/activity-pattern/out</arg>
+        </spark>
+        <ok to="end" />
+        <error to="fail" />
+    </action>
+
+    <kill name="fail">
+        <message>Workflow failed, error message [${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name='end' />
+</workflow-app>

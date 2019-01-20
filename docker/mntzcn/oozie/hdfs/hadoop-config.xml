@@ -19,7 +19,7 @@
 -->
 <configuration>
 
-    <property>
+    <!--<property>
         <name>mapreduce.jobtracker.kerberos.principal</name>
         <value>mapred/_HOST@LOCALREALM</value>
     </property>
@@ -32,7 +32,7 @@
     <property>
         <name>dfs.namenode.kerberos.principal</name>
         <value>hdfs/_HOST@LOCALREALM</value>
-    </property>
+    </property>-->
 
     <property>
         <name>mapreduce.framework.name</name>
@@ -42,6 +42,11 @@
     <property>
         <name>mapreduce.jobhistory.address</name>
         <value>hadoop:10020</value>
+    </property>
+
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://hadoop:9000</value>
     </property>
 
 </configuration>
