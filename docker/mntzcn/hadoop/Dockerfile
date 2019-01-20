@@ -1,4 +1,4 @@
-FROM hadoop-shm:latest
+FROM mntzcn/hadoop:latest
 
 ADD bootstrap.sh /etc/bootstrap.sh
 RUN chown root:root /etc/bootstrap.sh
