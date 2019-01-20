@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  base_ubuntu:
+    build:
+      ./ubuntu
+    image: mntzcn/ubuntu:latest
+    container_name: mntzcn-ubuntu
+  base_java8:
+    build:
+      ./java8
+    image: mntzcn/java8:latest
+    container_name: mntzcn-java8
+  base_hadoop:
+    build:
+      ./hado
+    image: mntzcn/hadoop:latest
+    container_name: mntzcn-hadoop

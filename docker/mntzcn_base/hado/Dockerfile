@@ -1,4 +1,4 @@
-FROM java8-shm:latest
+FROM mntzcn/java8:latest
 
 # -- install Hadoop
 
