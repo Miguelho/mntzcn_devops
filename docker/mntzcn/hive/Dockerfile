@@ -22,7 +22,13 @@ COPY jdbc/mysql-connector-java-8.0.12.jar /opt/hive/lib
 ADD core-site.xml.template /usr/local/hadoop/etc/hadoop/core-site.xml.template
 ADD bootstrap.sh /etc/bootstrap.sh
 RUN chown root:root /etc/bootstrap.sh
-
+#&& sh /etc/bootstrap.sh
 ADD hql/ddl.hql /opt/hive/ddl.hql
 
+WORKDIR /opt
+# -- ADD HADOOP BOOTSTRAP LISTENER
+ADD wait.sh /opt/wait.sh
+
+
 CMD ["sh", "/etc/bootstrap.sh", "-d"]
+#CMD ["sh", "/opt/wait.sh", "http://hadoop:50070","sh", "/opt/hive/bin/hive", "-f", "/opt/hive/ddl.hql"]
