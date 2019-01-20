@@ -1,8 +1,0 @@
-MYSQL_HOST=jdbc:mysql://mtnzcn_mysql:3306/
-MYSQL_USER=root
-MYSQL_PASS=mypassword
-MYSQL_DB=mtzcn?zeroDateTimeBehavior=convert_to_null
-MYSQL_TABLE=city
-
-sqoop job --create myjob -- import --connect $MYSQL_HOST$MYSQL_DB --username $MYSQL_USER --table $MYSQL_TABLE --m 1
-sqoop job --exec myjob
