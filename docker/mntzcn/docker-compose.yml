@@ -1,22 +1,6 @@
 version: '3'
 
 services:
-#  base_ubuntu:
-#    build:
-#      ./ubuntu
-#    image: ubuntu-shm:latest
-#    container_name: ubuntu-shm
-#  base_java8:
-#    build:
-#      ./java8
-#    image: java8-shm:latest
-#    container_name: java8-shm
-#  base_hadoop:
-#    build:
-#      ./hado
-#    image: hadoop-shm:latest
-#    container_name: hadoop-shm
-
   hadoop:
     build: ./hadoop
     container_name: hadoop
@@ -47,17 +31,17 @@ services:
     links:
     - mysql-metastore
 
-  mysql-metastore:
-    build:
-      ./mysql-ms
-    #image: mysql-shm:5.6.38
-    container_name: mysql-metastore
-    environment:
-    - MYSQL_ROOT_PASSWORD=mysecret
-    ports:
-    - "13306:3306"
-    volumes:
-    - $PWD/container_data/mysql:/var/lib/mysql
+#  metastore:
+#    build:
+#      ./mysql-ms
+#    #image: mysql-shm:5.6.38
+#    container_name: metastore
+#    environment:
+#    - MYSQL_ROOT_PASSWORD=mysecret
+#    ports:
+#    - "13306:3306"
+#    volumes:
+#    - $PWD/container_data/mysql:/var/lib/mysql
 
   master:
     build: ./spark
@@ -157,9 +141,6 @@ services:
       - 8090:8080
     expose:
       - 8090
-  sqoop:
-    build: ./sqoop
-    container_name: mntzcn_sqoop
 
 networks:
   default:
