@@ -1,0 +1,60 @@
+ONCE:
+Cargar el metastore:
+En hive-docker:
+hive/bin/hive -f hive/ddl.hql
+
+#1 ---
+En oozie-docker: tengo las sharelib oficiales junto a spark2 con la librería de sharelib-spark en /user/oozie/share/lib/
+#2 ---
+En oozie-docker: su oozie
+En oozie-docker: bin/oozie-setup.sh sharelib create -fs hdfs://hadoop:9000 -locallib /user/oozie/share
+
+#2.1 ----
+Actualizar las sharelib:
+oozie admin -sharelibupdate
+
+1. Subir a oozie-docker
+docker cp /Users/miguelhalysortuno/Documents/Master/TFM/devops/docker/mntzcn/oozie/workflow.xml hadoop_oozie:/user/oozie/jobs
+docker cp /Users/miguelhalysortuno/Documents/Master/TFM/devops/docker/mntzcn/oozie/spark-job.properties hadoop_oozie:/user/oozie/jobs
+2. subir a hdfs
+hdfs dfs -put /user/oozie/jobs/workflow.xml /user/oozie/jobs
+
+sh /user/oozie/jobs/wait.sh http://hadoop:50070 sh /user/oozie/jobs/setup-spark-action.sh
+######
+
+
+#4 ----
+En spark-docker: subo los jars de spark a /usr/local/hadoop/bin/hdfs dfs -put /opt/spark/jars/* hdfs://hadoop:9000/user/oozie/share/lib/lib_*/spark2
+#5 ----
+En spark-docker: subo la app a la ruta /usr/local/hadoop/bin/hdfs dfs -put /classpath/mntzn-assembly-0.1-SNAPSHOT.jar hdfs://hadoop:9000/user/oozie/jobs/mntzn-assembly-0.1-SNAPSHOT.jar
+#6 ----
+En spark-docker: subo el archivo de configuración hive-site.xml
+/usr/local/hadoop/bin/hdfs dfs -put /conf/hive-site.xml hdfs://hadoop:9000/user/oozie/share/lib/lib_*/spark2
+
+sh /etc/wait.sh http://hadoop:50070 sh /etc/setup-oozie.sh
+######
+
+#6 ----
+en hdfs hay que crear $HADOOP_HOME/bin/hdfs dfs -mkdir -p /etl/telco/mntzcn/activity-pattern/out/ y darle permisos escritura
+
+
+hadoop dockerfile
+######
+
+actualizar librerías de spark
+
+en oozie-docker: oozie admin -sharelibupdate
+
+#####
+
+
+#### EJECUCIÓN MOTOR #####
+#1 ----
+Ingestar eventos: docker run --network mntzcn_default --name ftpsource mntzcn/ftpsource &&  docker rm ftpsource
+Lanzar sqoops para ingesta de tablas dimensionales: \
+cd opt/sqoop/jobs/ && . run.sh
+Ejecutar el motor: \
+oozie job -config /user/oozie/jobs/spark-job.properties -run
+
+
+

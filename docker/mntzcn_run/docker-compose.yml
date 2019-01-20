@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+#  event_ingestion:
+#    build: ./ftpsource
+#    container_name: ftpsource
+  sqoop:
+    build: ./sqoop
+    container_name: mntzcn_sqoop
+#  process:
+
+networks:
+  default:
+    external:
+      name: mntzcn_default
